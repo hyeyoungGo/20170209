@@ -12,6 +12,22 @@ import java.util.List;
 import com.bit2017.emailList.vo.EmailListVo;
 
 public class EmailListDao {
+	public Connection getConnection() throws SQLException {
+		Connection conn = null;
+		
+		//1. JDBC Driver Loading ( JDBC Class Loading )
+		try {
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+		} catch (ClassNotFoundException e) {
+			System.out.println("Driver 로딩 실패 : " + e);
+		}
+		
+		//2. Connection 얻어오기 ( Connect to DB )
+		String url =  "jdbc:oracle:thin:@localhost:1521:xe"; 
+		conn = DriverManager.getConnection(url, "webdb", "webdb");
+		
+		return conn;
+	}
 	
 	public List<EmailListVo> getList() {
 		List<EmailListVo> list = new ArrayList<EmailListVo>();
@@ -21,12 +37,7 @@ public class EmailListDao {
 		ResultSet rs = null;
 		
 		try {   											// {} -> 안에 있는 건 지역변수
-			//1. JDBC Driver Loading ( JDBC Class Loading )
-			Class.forName("oracle.jdbc.driver.OracleDriver");
-			
-			//2. Connection 얻어오기 ( Connect to DB )
-			String url =  "jdbc:oracle:thin:@localhost:1521:xe"; 
-			conn = DriverManager.getConnection(url, "webdb", "webdb");
+			conn = getConnection();
 			
 			//3.SQL문 실행
 			String sql = "select no, first_name, last_name, email from emailList order by no desc";
@@ -48,10 +59,7 @@ public class EmailListDao {
 				
 				list.add(vo);
 			}
-			
 
-		} catch (ClassNotFoundException e) {
-			System.out.println("error: 드라이버 로딩 실패- " + e);
 		} catch (SQLException e) {
 			System.out.println("error: " + e);
 			//finally는 항상 꼭 실행된다.
@@ -80,12 +88,7 @@ public class EmailListDao {
 		PreparedStatement pstmt = null;
 		
 		try {   											// {} -> 안에 있는 건 지역변수
-			//1. JDBC Driver Loading ( JDBC Class Loading )
-			Class.forName("oracle.jdbc.driver.OracleDriver");
-			
-			//2. Connection 얻어오기 ( Connect to DB )
-			String url =  "jdbc:oracle:thin:@localhost:1521:xe"; 
-			conn = DriverManager.getConnection(url, "webdb", "webdb");
+			conn = getConnection();
 			
 			//3. SQL문 준비
 			String sql = "insert into emaillist values (seq_emaillist.nextval, ?, ?, ?)";
@@ -103,9 +106,6 @@ public class EmailListDao {
 			
 			return count == 1;
 
-		} catch (ClassNotFoundException e) {
-			System.out.println("error: 드라이버 로딩 실패- " + e);
-			return false;
 		} catch (SQLException e) {
 			System.out.println("error: " + e);
 			return false;
